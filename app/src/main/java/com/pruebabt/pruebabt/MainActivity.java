@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    private final String DEVICE_ADDRESS = "00:06:66:08:16:CA"; //MAC Address of Bluetooth Module
+    private final String DEVICE_ADDRESS = "00:06:66:08:16:CA"; //MAC Address del modulo Bluetooth
     private final UUID PORT_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     private BluetoothDevice device;
@@ -25,17 +25,17 @@ public class MainActivity extends AppCompatActivity {
 
     Button bluetooth_connect_btn;
 
-    String command; //string variable that will store value to be transmitted to the bluetooth module
+    String command; //variable de string que almacenará el valor que se transmitirá al módulo bluetooth
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //declaration of button variables
+        //declaracion de la variable button
         bluetooth_connect_btn = findViewById(R.id.bluetooth_connect_btn);
 
-        //Button that connects the device to the bluetooth module when pressed
+        //Button que conecta el dispositivo al módulo bluetooth cuando se presiona
         bluetooth_connect_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -50,22 +50,22 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //Initializes bluetooth module
+    //Inicializando BT modulo
     public boolean BTinit()
     {
         boolean found = false;
 
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();  //verifica si el dispositivo soporta bluetooth
 
-        if(bluetoothAdapter == null) //Checks if the device supports bluetooth
+        if(bluetoothAdapter == null) //verifica si el dispositivo soporta bluetooth
         {
-            Toast.makeText(getApplicationContext(), "Device doesn't support bluetooth", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "El Dispositivo No Soporta Bluetooth", Toast.LENGTH_SHORT).show();
         }
 
-        if(!bluetoothAdapter.isEnabled()) //Checks if bluetooth is enabled. If not, the program will ask permission from the user to enable it
+        if(!bluetoothAdapter.isEnabled()) //Verifica si el BT esta habilitado. Si no, le solicita al usuario que lo active
         {
-            Intent enableAdapter = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableAdapter,0);
+            Intent enableAdapter = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE); // Solicita al usuario que  active BT
+            startActivityForResult(enableAdapter,0);                       //Solicita al usuario que  active BT
 
             try
             {
@@ -79,9 +79,9 @@ public class MainActivity extends AppCompatActivity {
 
         Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
 
-        if(bondedDevices.isEmpty()) //Checks for paired bluetooth devices
+        if(bondedDevices.isEmpty()) //Comprueba si hay dispositivos Bluetooth emparejados
         {
-            Toast.makeText(getApplicationContext(), "Please pair the device first", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Por favor Emparejar Primero el Dispositvo", Toast.LENGTH_SHORT).show();
         }
         else
         {
@@ -105,11 +105,11 @@ public class MainActivity extends AppCompatActivity {
 
         try
         {
-            socket = device.createRfcommSocketToServiceRecord(PORT_UUID); //Creates a socket to handle the outgoing connection
+            socket = device.createRfcommSocketToServiceRecord(PORT_UUID); //Crea un socket para manejar la conexión saliente
             socket.connect();
 
             Toast.makeText(getApplicationContext(),
-                    "Connection to bluetooth device successful", Toast.LENGTH_LONG).show();
+                    "Conexión al Dispositivo Bluetooth exitosa", Toast.LENGTH_LONG).show();
         }
         catch(IOException e)
         {
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         {
             try
             {
-                outputStream = socket.getOutputStream(); //gets the output stream of the socket
+                outputStream = socket.getOutputStream(); //obtiene el output stream del socket
             }
             catch(IOException e)
             {
@@ -136,6 +136,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart()
     {
         super.onStart();
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        try
+        { // Cuando se sale de la aplicación esta parte permite
+            // que no se deje abierto el socket
+            socket.close();
+        } catch (IOException e2) {}
     }
 
 }
